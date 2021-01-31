@@ -63,14 +63,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ShowNext(View view) {
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(R.drawable.ic_placeholder);
-        requestOptions.error(R.drawable.ic_error);
 
 
         Glide.with(MainActivity.this)
                 .load(curPost.getGifURL())
-                .apply()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
         textView.setText(curPost.getDescription());
