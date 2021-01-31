@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">gg</string>
+    <string name="Gif_ImageView">gif-изображение с сайта developerslife.ru</string>
+    <string name="PreviousButton">Previous</string>
+    <string name="Button_next">Button</string>
+    <string name="Button_Next">Next</string>
+</resources>
