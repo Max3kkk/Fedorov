@@ -3,6 +3,8 @@ package com.example.gg;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import java.util.*;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,8 +21,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     TextView textView;
-
-    Post curPost;
+    List<Post> posts;
+    int curPostIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,48 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         textView = findViewById(R.id.textView);
 
+        posts = new ArrayList<Post>();
+        LoadNewPost();
+    }
+
+    public void ShowPrev() {
+        if (curPostIndex > 0) {
+            curPostIndex--;
+            Glide.with(MainActivity.this)
+                    .load(posts.get(curPostIndex).getGifURL())
+                    .onlyRetrieveFromCache(true)
+                    .into(imageView);
+            textView.setText(posts.get(curPostIndex).getDescription());
+        }
+    }
+
+    public void ShowNext() {
+        curPostIndex++;
+        if (curPostIndex == posts.size() - 1) {
+            LoadNewPost();
+            Glide.with(MainActivity.this)
+                    .load(posts.get(curPostIndex).getGifURL())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imageView);
+        } else {
+            Glide.with(MainActivity.this)
+                    .load(posts.get(curPostIndex).getGifURL())
+                    .onlyRetrieveFromCache(true)
+                    .into(imageView);
+        }
+        textView.setText(posts.get(curPostIndex).getDescription());
+
+    }
+
+    public void onNextButton(View view){
+        ShowNext();
+    }
+
+    public void onPrevButton(View view){
+        ShowPrev();
+    }
+
+    void LoadNewPost(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://developerslife.ru/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -37,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         JsonDeveloperslifeApi jsonDeveloperslifeApi = retrofit.create(JsonDeveloperslifeApi.class);
 
         Call<Post> call = jsonDeveloperslifeApi.getPost();
-
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
@@ -46,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                curPost = (Post)response.body();
+                posts.add((Post)response.body());
             }
 
             @Override
@@ -54,22 +97,5 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(t.getMessage());
             }
         });
-
-
-    }
-
-    public void ShowPrev(View view) {
-
-    }
-
-    public void ShowNext(View view) {
-
-
-        Glide.with(MainActivity.this)
-                .load(curPost.getGifURL())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imageView);
-        textView.setText(curPost.getDescription());
-
     }
 }
